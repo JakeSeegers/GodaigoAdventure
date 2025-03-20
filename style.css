@@ -1,0 +1,554 @@
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #111;
+    color: #eee;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    color: #d9b08c;
+    text-shadow: 0 0 5px #b75000;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 900px; /* Increased from 800px */
+    width: 100%;
+}
+
+canvas {
+    background-color: #222;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    max-width: 100%;
+    height: auto;
+    cursor: grab; /* Default cursor for panning */
+}
+
+canvas:active {
+    cursor: grabbing; /* When mouse is pressed */
+}
+
+.controls {
+    background-color: #222;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.control-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.stone-selector {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 5px;
+}
+
+.mode-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.mode-button {
+    width: 45%;
+    padding: 8px;
+    margin: 0 5px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.mode-button.active {
+    box-shadow: 0 0 10px currentColor;
+    animation: pulse 1s infinite;
+}
+
+.move-mode {
+    background-color: #2a3a4a;
+    color: #58a4f4;
+    border: 2px solid #58a4f4;
+}
+
+.place-mode {
+    background-color: #3a2a3a;
+    color: #f458a4;
+    border: 2px solid #f458a4;
+}
+
+.stone-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin: 0 5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stone-button:hover::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.stone-earth {
+    background-color: #233a23;
+    color: #69d83a;
+    border-color: #69d83a;
+}
+
+.stone-water {
+    background-color: #1e2c4a;
+    color: #5894f4;
+    border-color: #5894f4;
+}
+
+.stone-fire {
+    background-color: #3a1a1a;
+    color: #ed1b43;
+    border-color: #ed1b43;
+}
+
+.stone-wind {
+    background-color: #3a3000;
+    color: #ffce00;
+    border-color: #ffce00;
+}
+
+.stone-void {
+    background-color: #2a1e3a;
+    color: #9458f4;
+    border-color: #9458f4;
+}
+
+/* Animation keyframes */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fire-flicker {
+    0% { opacity: 0.6; }
+    25% { opacity: 1; }
+    50% { opacity: 0.7; }
+    75% { opacity: 0.9; }
+    100% { opacity: 0.6; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, -20px); }
+    15% { opacity: 1; transform: translate(-50%, 0); }
+    85% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+.stone-button.selected {
+    animation: pulse 1s infinite;
+    box-shadow: 0 0 10px currentColor;
+}
+
+.stone-count {
+    font-size: 12px;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.action-points {
+    background-color: #333;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Action buttons container */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* General button styles */
+button {
+    background-color: #b75000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin: 4px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background-color: #d9b08c;
+    color: #333;
+    transform: scale(1.05);
+}
+
+/* Break mode button */
+#break-mode {
+    background-color: #4a2a2a;
+    color: #f4a458;
+    border: 1px solid #f4a458;
+}
+
+#break-mode.active {
+    background-color: #f4a458;
+    color: #333;
+    animation: pulse 1s infinite;
+    box-shadow: 0 0 10px #f4a458;
+}
+
+#break-mode:hover {
+    background-color: #5a3a3a;
+}
+
+/* Back to menu button */
+#back-to-menu-button {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    transition: all 0.3s;
+}
+
+#back-to-menu-button:hover {
+    background-color: #444;
+    transform: scale(1.05);
+}
+
+.legend {
+    background-color: #222;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+.legend h3, .legend h4 {
+    margin-top: 0;
+}
+
+.legend-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+#status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #333;
+    min-height: 20px;
+}
+
+/* Keyboard shortcut info */
+.shortcuts-info {
+    margin-top: 15px;
+    border-top: 1px solid #444;
+    padding-top: 10px;
+}
+
+.shortcuts-info ul {
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.shortcuts-info li {
+    margin-bottom: 5px;
+}
+
+/* Stone sacrifice dialog */
+#sacrifice-dialog {
+    font-family: 'Courier New', monospace;
+    color: #eee;
+}
+
+#sacrifice-dialog h3 {
+    animation: fire-flicker 1.5s infinite;
+}
+
+#sacrifice-dialog .stone-button {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin: 0 5px;
+    position: relative;
+}
+
+#sacrifice-dialog .stone-button:hover:not([disabled]) {
+    transform: scale(1.1);
+}
+
+#sacrifice-dialog .stone-button.selected {
+    animation: pulse 1s infinite;
+    box-shadow: 0 0 10px currentColor;
+}
+
+#sacrifice-dialog button {
+    transition: all 0.2s;
+}
+
+#sacrifice-dialog button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Break confirmation dialog */
+#break-confirm-dialog {
+    font-family: 'Courier New', monospace;
+    color: #eee;
+}
+
+#break-confirm-dialog button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#break-confirm-dialog button:hover {
+    transform: scale(1.05);
+}
+
+/* Visual effect for hexes that can be broken */
+.breakable-hex {
+    animation: pulse 1.5s infinite;
+}
+
+/* Void AP indicator */
+#void-ap-indicator {
+    color: #9458f4;
+    font-weight: bold;
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+/* Start Menu Specific Styles */
+#start-menu-container {
+    transition: opacity 0.5s ease;
+}
+
+/* Settings UI Styles */
+.settings-section {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+}
+
+.settings-section h3 {
+    color: #5894f4;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.setting-item {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.setting-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-value {
+    color: #ffce00;
+    font-weight: bold;
+}
+
+.settings-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.settings-button:hover {
+    transform: scale(1.05);
+}
+
+/* Toggle switch styles */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #444;
+    transition: .4s;
+    border-radius: 30px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #b75000;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(30px);
+}
+
+/* Panning-related styles */
+.nav-controls {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+#center-view-btn {
+    background-color: #444;
+    border: 1px solid #666;
+    color: white;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+#center-view-btn:hover {
+    background-color: #555;
+    color: #fff;
+}
+
+.pan-help-text {
+    font-size: 10px;
+    color: #aaa;
+    margin-left: 5px;
+}
+
+/* Make cursor show grabbing state during panning */
+canvas.panning {
+    cursor: grabbing !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .game-container {
+        max-width: 100%;
+    }
+    
+    .legend-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #start-menu-container h1 {
+        font-size: 3rem;
+    }
+    
+    /* Mobile optimizations for panning */
+    .nav-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    #center-view-btn {
+        padding: 5px 10px;
+        font-size: 16px; /* Larger touch target */
+    }
+}

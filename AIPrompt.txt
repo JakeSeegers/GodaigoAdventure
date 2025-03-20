@@ -1,0 +1,256 @@
+Godaigo Stone Interaction Game - AI Assistant Prompt
+You are helping a user who is working with a browser-based hexagonal grid game called "Godaigo." This game features elemental stones with unique interactions and movement mechanics. The user is developing this game through AI assistance and has minimal coding experience.
+User's Development Process
+
+Development Environment: The user maintains iterations of the game in folders on Windows
+Technology Stack: HTML and JavaScript (primarily), but open to other technologies if recommended
+Testing Process: The user tests the code in Chrome and uses the browser's inspect tool to identify and report bugs
+Implementation Method: The user relies on AI to develop new code and discuss game improvements
+Code Management Constraints:
+
+The user has limited coding experience and struggles with editing existing files
+Provide complete, self-contained code files whenever possible to avoid manual integration
+Keep individual .js files small (under 15,000 characters) for easier AI editing and management
+Highly modular approach preferred, with functionality separated across multiple small files
+
+
+
+Current Project Structure
+The project currently consists of these interconnected JavaScript files:
+Core Systems:
+
+HexGrid.js: The core game engine that integrates all subsystems
+stones.js: Defines the five stone types (Earth, Water, Fire, Wind, Void) and their properties
+stoneInteractions.js: Implements the interaction rules between different stone types
+
+Specialized Modules:
+
+HexMath.js: Handles hex coordinate calculations and transformations
+RenderSystem.js: Manages drawing and rendering operations
+WaterMimicry.js: Handles water stone behavior and chain detection
+MovementSystem.js: Manages movement costs and player movement
+TestSystem.js: Contains test cases for stone interactions
+animations.js: Manages visual effects for stone interactions and chain reactions
+debugTools.js: Provides debugging tools for testing stone interactions
+challengeMode.js: Implements challenge mode where players cross the grid using as few AP as possible
+
+Other Files:
+
+main.js: Initializes the game and sets up event listeners
+index.html & style.css: Structure and style the game interface
+
+Planned New Features (Not Yet Implemented)
+MegaTile System (To Be Developed)
+A new system to add elemental shrines and special hexes:
+
+MegaTileSystem.js will be a new component that defines special groups of hexes called "mega-tiles"
+Each mega-tile will have an elemental type (earth, water, fire, wind, or void)
+Mega-tiles will be revealed when the player moves onto one of their hexes
+Each mega-tile will have a central "shrine" hex that provides bonuses when activated
+Important: Players MUST be able to place stones on ALL hexes, including these future mega-tiles
+When implemented, players will receive bonus stones by ending their turn on a shrine
+
+Menu System (To Be Developed)
+A more advanced menu system:
+
+Will provide a proper game start screen
+Will offer different game modes including the existing challenge mode
+Will include settings and help screens
+Will support saving/loading game state
+
+Key Game Mechanics (Currently Implemented)
+Stone Types & Properties
+
+Earth (▲): Creates impassable barriers
+Water (◯): Mimics properties of adjacent stones in connected chains
+Fire (♦): Destroys adjacent stones (except Void and other Fire)
+Wind (≋): Creates zones of free movement
+Void (✺): Nullifies the abilities of other stones; Void stones in a player's inventory can also be used as additional Action Points without being consumed
+
+Movement System
+
+Player moves cost varying action points (AP) based on hex type
+Wind stones (and water mimicking wind) create zones of free movement
+Hexes are revealed as the player explores the grid
+
+Challenge Mode
+The game includes a challenge mode with these features:
+
+Player starts at the bottom edge of the grid and must reach the top
+The goal (top edge) is highlighted with gold indicators
+Random stones are distributed according to dice-roll formulas:
+
+1d4 void stones (1-4 stones)
+2d4 wind stones (2-8 stones)
+3d4 fire stones (3-12 stones)
+4d4 water stones (4-16 stones)
+5d4 earth stones (5-20 stones)
+
+
+Player starts with 5 Earth, 4 Water, 3 Fire, 2 Wind, and 1 Void stone
+AP usage is tracked and score is calculated as (100 - AP used)
+Best score is saved between games using localStorage
+Can be toggled with 'C' key or Challenge Mode button
+
+Stone Interaction Rules
+Basic Stone Properties
+
+Earth (▲): Creates impassable barriers
+Water (◯): Mimics properties of adjacent stones in connected chains
+Fire (♦): Destroys adjacent stones (except Void and other Fire)
+Wind (≋): Creates zones of free movement
+Void (✺): Nullifies the abilities of other stones
+
+Stone Interactions (Bidirectional)
+Fire Interactions
+
+Fire + Fire: No effect (fire stones don't destroy each other)
+Fire + Water: Fire destroys water; if water is part of a chain, all connected water stones are destroyed. Before being destroyed, the water stone temporarily gains fire's ability, destroying any adjacent stones (except void or fire)
+Fire + Earth: Fire destroys Earth stone
+Fire + Wind: Fire destroys Wind stone
+Fire + Void: No effect (Void nullifies Fire's destruction ability)
+
+Water Interactions
+
+Water + Water: Forms a chain that propagates mimicry effects
+Water + Fire: Water is destroyed; triggers chain reaction destroying all connected water stones
+Water + Earth: Water mimics Earth's impassable property
+Water + Wind: Water mimics Wind's free movement property
+Water + Void: Void nullifies Water's mimicry ability
+Water + Fire (Chain Reaction): Before being consumed, water mimics fire's destruction ability and destroys adjacent non-Fire/non-Void stones
+
+Void Interactions
+
+Void + Any Stone: Nullifies the adjacent stone's special abilities
+Void + Fire: Prevents Fire from destroying adjacent stones
+Void + Water: Prevents Water from mimicking adjacent stones
+Void + Wind: Prevents Wind from creating free movement
+
+Complex Multi-Stone Interactions
+
+Water adjacent to multiple stone types: Water will mimic the stone with highest priority according to rank (Earth > Fire > Wind > Void). If a higher-ranked stone is placed adjacent to a water stone, the water will immediately change to mimic the higher-ranked stone's properties
+Fire + Void + Other Stone: Void nullifies Fire's destruction ability, protecting the third stone
+Water + Fire + Void: Void prevents Fire from destroying the Water
+Water + Earth + Wind: Water mimics Earth (not Wind) because Earth has higher priority
+Water chain + Earth: All water stones in the chain mimic Earth's properties
+Water chain + Wind + Void: Void breaks the chain at that point; only water stones not adjacent to Void will mimic Wind
+Fire + Water + Earth: Fire destroys Water, Water doesn't have time to mimic Earth
+Fire + Water Chain + Other Stones: Water mimics Fire's destruction ability before being consumed; can destroy adjacent non-Fire/non-Void stones
+
+Mimicry Priority (Ranked)
+Water mimics adjacent stones with this priority (highest to lowest):
+
+Earth (rank 5)
+Fire (rank 3)
+Wind (rank 2)
+Void (rank 1)
+
+Chain Reaction Rules
+
+When a water stone is affected by fire, all connected water stones are destroyed
+Before being consumed, water stones in a chain will mimic fire's destruction ability and destroy adjacent non-Fire/non-Void stones
+Water stones form mimicry chains that propagate properties (e.g., all water stones connected to a water stone adjacent to wind gain wind properties)
+Void stones break mimicry chains (water stones adjacent to void cannot participate in chains)
+
+Movement Costs
+
+Empty Hex: 1 AP
+Earth: Impassable (infinite AP)
+Water (normal): 2 AP
+Water (mimicking Earth): Impassable
+Water (mimicking Wind): 0 AP (free movement)
+Fire: Impassable
+Wind: 0 AP (free movement)
+Void: 1 AP
+
+Edge Cases
+
+Wind zones extend to adjacent hexes (not just the hex containing the wind stone)
+Entering or exiting a wind zone costs 1 AP regardless of the destination hex's normal cost
+Placing a stone triggers interaction checks in both directions (outgoing and incoming)
+
+Common Modification Patterns
+Adding New Stone Types
+
+Update STONE_TYPES object in stones.js with name, color, symbol, and rank
+Add stone counts in stoneCounts and stoneCapacity objects
+Define interaction rules in the interactionRules matrix in stoneInteractions.js
+Create interaction handler methods in StoneInteractionSystem class
+Update CSS for the new stone type in style.css
+
+Modifying Stone Interactions
+
+Locate the relevant interaction handler in stoneInteractions.js
+Understand the bidirectional interaction system (both affecting and being affected)
+Use debug mode (press 'D') to test interaction changes
+
+Animation Enhancements
+
+Create a new animation class extending Animation in animations.js
+Implement the update method to control animation behavior
+Call the animation from the appropriate interaction handler
+
+Movement & Grid Modifications
+
+Modify MovementSystem.js to change movement rules
+Update HexGrid.createGrid to change grid size or shape
+Consider optimizing with dirty rect tracking for performance
+
+Water Mimicry Modifications
+
+Update WaterMimicry.js to adjust how water stones mimic other stones
+Modify the getWaterMimicType or isWaterChainMimicking methods
+Test thoroughly with the 'W' key debug functionality
+
+Rendering Modifications
+
+Update RenderSystem.js to change how stones or hexes are drawn
+Modify the renderSingleHex or drawWaterMimicryIndicator methods
+Use the render() method for full redraws and renderOptimized() for partial updates
+
+Coordinate System Modifications
+
+Update HexMath.js to change coordinate calculations or conversions
+Modify the axialToPixel or pixelToAxial methods
+Use the getHexesInRange or getHexRing methods for area operations
+
+Challenge Mode Modifications
+
+Update challengeMode.js to adjust the challenge rules or scoring
+Modify the distribution of stones using the rollDice method
+Adjust the goal position or the visual indicators in the RenderSystem
+
+Testing Your Changes
+
+Update TestSystem.js to add new test cases
+Run existing tests using the 'T' key
+Use the debugger (toggle with 'D' key) to step through interactions
+
+Debugging
+The game includes a robust debugging system:
+
+Toggle debug mode with 'D' key
+Run interaction tests with 'T' key
+Debug water mimicry with 'W' key
+Step through interactions in debug panel
+Visual markers show interaction paths
+
+Render System
+The game uses an optimized rendering approach:
+
+Tracks "dirty" hexes that need redrawing
+Uses markHexDirty to flag hexes that need updates
+The renderOptimized method only redraws necessary elements
+
+When Assisting the User
+
+Provide Complete Files: Always provide complete code files rather than snippets or partial updates
+Modular Approach: Suggest creating new small files rather than modifying existing ones when possible
+Size Constraints: Keep individual JS files under 15,000 characters
+Clear Instructions: Include detailed instructions on where to save files and how to include them in HTML
+Testing Guidance: Offer specific testing steps to verify the implementation works
+Bug Reporting: Explain how to identify potential issues using Chrome's inspect tool
+File Integration: When new files need to interact with existing ones, clearly explain the connections
+Documentation: Include comments in the code to help the user understand how it works
+
+Remember that the user prefers not to manually modify existing code, so provide solutions that minimize the need for manual editing. When asked for a code fix, figure out what file needs adjusting and provide the full updated code for the fix, being aware that the codebase has been modularized into smaller components.
