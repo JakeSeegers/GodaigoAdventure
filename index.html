@@ -85,33 +85,35 @@
 
   <!-- Include external JavaScript files in proper order -->
   <!-- First the dependencies -->
-  <script src="stones.js"></script>
-  <script src="debugTools.js"></script>
-  <script src="animations.js"></script>
+  <script src="./stones.js"></script>
+  <script src="./debugTools.js"></script>
+  <script src="./animations.js"></script>
   
   <!-- New modular components -->
-  <script src="HexMath.js"></script>
-  <script src="RenderSystem.js"></script>
-  <script src="WaterMimicry.js"></script>
-  <script src="MovementSystem.js"></script>
-  <script src="TestSystem.js"></script>
-  <script src="challengeMode.js"></script>
+  <script src="./HexMath.js"></script>
+  <script src="./RenderSystem.js"></script>
+  <script src="./WaterMimicry.js"></script>
+  <script src="./MovementSystem.js"></script>
+  <script src="./TestSystem.js"></script>
+  <script src="./challengeMode.js"></script>
   
   <!-- Add Panning System before HexGrid -->
-  <script src="PanningSystem.js"></script>
+  <script src="./PanningSystem.js"></script>
+  <script src="./HexGrid.js"></script>
   
-  <!-- Core systems that depend on components above -->
-  <script src="stoneInteractions.js"></script>
-  <script src="MonsterSystem.js"></script>
-  <script src="HexGrid.js"></script>
+  <!-- Add MegaTile Integration after HexGrid -->
+  <script src="./MegaTileIntegration.js"></script>
   
-  <!-- New menu system components (should be loaded after game components but before main.js) -->
-  <script src="gameSettings.js"></script>
-  <script src="startMenu.js"></script>
-  <script src="MegaTileSystem.js"></script>
-  <script src="MegaTileIntegration.js"></script>
+  <!-- Add Monster System after HexGrid -->
+  <script src="./MonsterSystem.js"></script>
   
-  <!-- Main.js should be loaded last as it uses all the components -->
-  <script src="main.js"></script>
+  <!-- Add Game Settings -->
+  <script src="./gameSettings.js"></script>
+  
+  <!-- Add Start Menu -->
+  <script src="./startMenu.js"></script>
+  
+  <!-- Add Main Game Logic -->
+  <script src="./main.js"></script>
 </body>
 </html>
